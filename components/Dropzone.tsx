@@ -6,7 +6,7 @@ import { Upload, Image as ImageIcon, CheckCircle2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface DropzoneProps {
-  onFileSelect: (file: File) => void;
+  onFileSelect: (file: File) => void | Promise<void>;
   disabled?: boolean;
   currentFile?: File | null;
 }

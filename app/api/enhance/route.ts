@@ -8,6 +8,9 @@ import { Preset, AspectRatio, ImageSize, ProductOptions, DEFAULT_PRODUCT_OPTIONS
 // Force Node.js runtime (not Edge)
 export const runtime = "nodejs";
 
+// Increase timeout for image generation
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
     // Parse FormData

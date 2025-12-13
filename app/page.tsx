@@ -7,6 +7,7 @@ import { MainCanvas } from "@/components/MainCanvas";
 import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS } from "@/types";
 import { validateImageFile } from "@/lib/validators";
 import { applyProductPreset } from "@/lib/productPresets";
+import { compressImage } from "@/lib/imageCompression";
 
 const DEFAULT_OPTIONS: EnhanceOptions = {
   preset: "interior",
@@ -44,7 +45,7 @@ export default function Home() {
     }
   }, [productOptions.quickPreset]);
 
-  const handleFileSelect = useCallback((selectedFile: File) => {
+  const handleFileSelect = useCallback(async (selectedFile: File) => {
     const validation = validateImageFile(selectedFile);
     if (!validation.valid) {
       setError(validation.error || "Invalid file");
@@ -53,9 +54,12 @@ export default function Home() {
 
     setError(null);
     setEnhancedImage(null);
-    setFile(selectedFile);
 
-    const previewUrl = URL.createObjectURL(selectedFile);
+    // Compress large images (especially from mobile cameras)
+    const processedFile = await compressImage(selectedFile);
+    setFile(processedFile);
+
+    const previewUrl = URL.createObjectURL(processedFile);
     setOriginalPreview(previewUrl);
   }, []);
 
