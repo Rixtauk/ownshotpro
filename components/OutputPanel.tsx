@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Loader2, Sparkles, AlertCircle } from "lucide-react";
+import { Loader2, AlertCircle } from "lucide-react";
 
 interface OutputPanelProps {
   isLoading: boolean;
@@ -38,17 +38,7 @@ export function OutputPanel({
           className="w-full h-11 text-base font-medium btn-glass rounded-xl"
           size="lg"
         >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-              Enhancing...
-            </>
-          ) : (
-            <>
-              <Sparkles className="mr-2 h-5 w-5" />
-              Generate
-            </>
-          )}
+          {isLoading ? "Enhancing..." : "Generate"}
         </Button>
 
         {/* Status */}

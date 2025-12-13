@@ -3,7 +3,7 @@
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ImageIcon, Sparkles, Download, ZoomIn } from "lucide-react";
+import { ImageIcon, Sparkles, ZoomIn } from "lucide-react";
 
 interface BeforeAfterProps {
   originalUrl: string | null;
@@ -119,7 +119,6 @@ export function BeforeAfter({
                 onClick={onDownload}
                 className="w-full h-10 rounded-xl border-2"
               >
-                <Download className="mr-2 h-4 w-4" />
                 Download Enhanced Image
               </Button>
             )}

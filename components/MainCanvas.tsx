@@ -5,8 +5,6 @@ import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
-  Download,
-  Sparkles,
   Loader2,
   Upload,
   AlertCircle,
@@ -152,7 +150,6 @@ export function MainCanvas({
               onClick={onDownload}
               className="h-9 rounded-lg border-white/30 bg-white/40"
             >
-              <Download className="mr-2 h-4 w-4" />
               Download
             </Button>
           )}

@@ -4,6 +4,7 @@ import { useState, useCallback } from "react";
 import { Dropzone } from "@/components/Dropzone";
 import { OptionsForm } from "@/components/OptionsForm";
 import { MainCanvas } from "@/components/MainCanvas";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS } from "@/types";
 import { validateImageFile } from "@/lib/validators";
 import { applyProductPreset } from "@/lib/productPresets";
@@ -149,6 +150,7 @@ export default function Home() {
               Pro
             </span>
           </div>
+          <ThemeToggle />
           <div className="hidden text-sm text-muted-foreground md:block">
             Transform your photos into stock-quality images
           </div>
