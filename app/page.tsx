@@ -142,17 +142,19 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-gradient-mesh">
       {/* Top bar */}
-      <header className="sticky top-0 z-10 border-b border-white/20 bg-white/70 backdrop-blur-xl">
+      <header className="sticky top-0 z-10 border-b border-border bg-background/80 backdrop-blur-xl">
         <div className="mx-auto flex h-14 max-w-screen-2xl items-center justify-between px-6">
           <div className="flex items-center gap-2">
-            <span className="text-lg font-semibold text-gray-900">OwnShot</span>
+            <span className="text-lg font-semibold text-foreground">OwnShot</span>
             <span className="rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
               Pro
             </span>
           </div>
-          <ThemeToggle />
-          <div className="hidden text-sm text-muted-foreground md:block">
-            Transform your photos into stock-quality images
+          <div className="flex items-center gap-4">
+            <span className="hidden text-sm text-muted-foreground md:block">
+              Transform your photos into stock-quality images
+            </span>
+            <ThemeToggle />
           </div>
         </div>
       </header>

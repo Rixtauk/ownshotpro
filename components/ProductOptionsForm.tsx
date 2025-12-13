@@ -81,7 +81,7 @@ export function ProductOptionsForm({
       <CardContent className="p-6 space-y-6">
         {/* Quick Presets */}
         <div className="space-y-3">
-          <Label className="text-gray-800">Quick Presets</Label>
+          <Label className="text-foreground">Quick Presets</Label>
           <div className="grid grid-cols-2 gap-2">
             {(
               Object.entries(QUICK_PRESET_LABELS) as [
@@ -105,7 +105,7 @@ export function ProductOptionsForm({
 
         {/* Shot Type */}
         <div className="space-y-3">
-          <Label className="text-gray-800">Shot Type</Label>
+          <Label className="text-foreground">Shot Type</Label>
           <div className="grid grid-cols-3 gap-2">
             {(
               Object.entries(SHOT_TYPE_LABELS) as [ProductShotType, string][]
@@ -125,7 +125,7 @@ export function ProductOptionsForm({
 
         {/* Background Section */}
         <div className="space-y-3">
-          <Label className="text-gray-800 text-base font-semibold">
+          <Label className="text-foreground text-base font-semibold">
             Background
           </Label>
           <div className="space-y-4 pl-2">
@@ -190,7 +190,7 @@ export function ProductOptionsForm({
 
         {/* Camera Section */}
         <div className="space-y-3">
-          <Label className="text-gray-800 text-base font-semibold">
+          <Label className="text-foreground text-base font-semibold">
             Camera
           </Label>
           <div className="space-y-4 pl-2">
@@ -250,7 +250,7 @@ export function ProductOptionsForm({
 
         {/* Lighting Section */}
         <div className="space-y-3">
-          <Label className="text-gray-800 text-base font-semibold">
+          <Label className="text-foreground text-base font-semibold">
             Lighting
           </Label>
           <div className="space-y-4 pl-2">
@@ -304,7 +304,7 @@ export function ProductOptionsForm({
 
         {/* Shadow */}
         <div className="space-y-2">
-          <Label className="text-gray-800">Shadow</Label>
+          <Label className="text-foreground">Shadow</Label>
           <Select
             value={options.shadow}
             onValueChange={(value: ShadowType) =>
@@ -330,7 +330,7 @@ export function ProductOptionsForm({
         {/* Label Protection */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <Label className="text-gray-800">Label Protection</Label>
+            <Label className="text-foreground">Label Protection</Label>
             <Switch
               checked={options.labelProtection.enabled}
               onCheckedChange={(checked) =>
@@ -364,7 +364,7 @@ export function ProductOptionsForm({
         {/* Advanced Section */}
         <Collapsible open={advancedOpen} onOpenChange={setAdvancedOpen}>
           <CollapsibleTrigger className="flex w-full items-center justify-between py-2">
-            <Label className="text-gray-800 text-base font-semibold cursor-pointer">
+            <Label className="text-foreground text-base font-semibold cursor-pointer">
               Advanced Options
             </Label>
             <ChevronDown

@@ -100,17 +100,17 @@ export function MainCanvas({
   return (
     <Card className="flex flex-1 flex-col overflow-hidden">
       {/* Canvas header */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/20 p-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
         {/* View mode toggle */}
-        <div className="inline-flex rounded-lg border border-white/30 bg-white/40 p-1">
+        <div className="inline-flex rounded-lg border border-border bg-muted/50 p-1">
           <button
             onClick={() => setViewMode("enhanced")}
             disabled={!enhancedUrl}
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
               viewMode === "enhanced"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground disabled:text-muted-foreground/50 disabled:cursor-not-allowed"
             )}
           >
             Enhanced
@@ -121,8 +121,8 @@ export function MainCanvas({
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
               viewMode === "compare"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground disabled:text-muted-foreground/50 disabled:cursor-not-allowed"
             )}
           >
             Compare
@@ -133,8 +133,8 @@ export function MainCanvas({
             className={cn(
               "rounded-md px-3 py-1.5 text-sm font-medium transition-all",
               viewMode === "original"
-                ? "bg-white text-gray-900 shadow-sm"
-                : "text-gray-600 hover:text-gray-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                ? "bg-background text-foreground shadow-sm"
+                : "text-muted-foreground hover:text-foreground disabled:text-muted-foreground/50 disabled:cursor-not-allowed"
             )}
           >
             Original
@@ -148,7 +148,7 @@ export function MainCanvas({
               variant="outline"
               size="sm"
               onClick={onDownload}
-              className="h-9 rounded-lg border-white/30 bg-white/40"
+              className="h-9 rounded-lg border-border bg-muted/50"
             >
               Download
             </Button>
@@ -173,25 +173,25 @@ export function MainCanvas({
       >
         {/* Error display */}
         {error && (
-          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-lg bg-red-50 border border-red-200 px-4 py-2 shadow-lg">
-            <AlertCircle className="h-4 w-4 text-red-500" />
-            <span className="text-sm text-red-700">{error}</span>
+          <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/30 px-4 py-2 shadow-lg">
+            <AlertCircle className="h-4 w-4 text-destructive" />
+            <span className="text-sm text-destructive">{error}</span>
           </div>
         )}
 
         <div
           ref={containerRef}
-          className="relative h-full min-h-[400px] w-full overflow-hidden rounded-xl bg-gradient-to-br from-gray-100 to-gray-50"
+          className="relative h-full min-h-[400px] w-full overflow-hidden rounded-xl bg-muted"
         >
           {!originalUrl ? (
             // Empty state
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-muted-foreground">
-              <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
-                <Upload className="w-8 h-8 text-gray-400" />
+              <div className="w-16 h-16 rounded-full bg-muted flex items-center justify-center">
+                <Upload className="w-8 h-8 text-muted-foreground" />
               </div>
               <div className="text-center">
-                <p className="font-medium text-gray-600">Upload an image to get started</p>
-                <p className="text-sm text-gray-500 mt-1">Then click Generate to enhance</p>
+                <p className="font-medium text-muted-foreground">Upload an image to get started</p>
+                <p className="text-sm text-muted-foreground mt-1">Then click Generate to enhance</p>
               </div>
             </div>
           ) : viewMode === "compare" && enhancedUrl ? (
@@ -224,13 +224,13 @@ export function MainCanvas({
 
               {/* Slider handle */}
               <div
-                className="absolute top-0 bottom-0 w-1 bg-white shadow-lg cursor-ew-resize z-10"
+                className="absolute top-0 bottom-0 w-1 bg-background shadow-lg cursor-ew-resize z-10"
                 style={{ left: `${comparePosition}%`, transform: "translateX(-50%)" }}
                 onMouseDown={handleMouseDown}
                 onTouchMove={handleTouchMove}
               >
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white shadow-lg flex items-center justify-center">
-                  <GripVertical className="w-5 h-5 text-gray-600" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-background shadow-lg flex items-center justify-center">
+                  <GripVertical className="w-5 h-5 text-muted-foreground" />
                 </div>
               </div>
 
@@ -275,7 +275,7 @@ export function MainCanvas({
       </div>
 
       {/* Canvas footer */}
-      <div className="flex items-center justify-between gap-4 border-t border-white/20 p-4">
+      <div className="flex items-center justify-between gap-4 border-t border-border p-4">
         <div className="hidden text-xs text-muted-foreground md:block truncate">
           {settingsSummary}
         </div>

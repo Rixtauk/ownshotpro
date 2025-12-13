@@ -43,7 +43,7 @@ export function Dropzone({
       {...getRootProps()}
       className={cn(
         "glass-card glass-card-hover rounded-xl p-8 text-center cursor-pointer transition-all",
-        "border-2 border-dashed border-white/40",
+        "border-2 border-dashed border-border",
         "hover:border-primary/50",
         isDragActive && "border-primary bg-primary/10 scale-[1.02]",
         isDragReject && "border-destructive bg-destructive/10",
@@ -54,11 +54,11 @@ export function Dropzone({
       <div className="flex flex-col items-center gap-4">
         {currentFile ? (
           <>
-            <div className="w-14 h-14 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle2 className="w-7 h-7 text-green-600" />
+            <div className="w-14 h-14 rounded-full bg-green-500/10 flex items-center justify-center">
+              <CheckCircle2 className="w-7 h-7 text-green-500" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">{currentFile.name}</p>
+              <p className="font-semibold text-foreground">{currentFile.name}</p>
               <p className="text-sm text-muted-foreground mt-1">
                 {(currentFile.size / 1024 / 1024).toFixed(2)} MB
               </p>
@@ -69,11 +69,11 @@ export function Dropzone({
           </>
         ) : (
           <>
-            <div className="w-14 h-14 rounded-full bg-blue-100 flex items-center justify-center">
-              <Upload className="w-7 h-7 text-blue-600" />
+            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+              <Upload className="w-7 h-7 text-primary" />
             </div>
             <div>
-              <p className="font-semibold text-gray-800">
+              <p className="font-semibold text-foreground">
                 {isDragActive ? "Drop your image here" : "Drag & drop an image"}
               </p>
               <p className="text-sm text-muted-foreground mt-1">
