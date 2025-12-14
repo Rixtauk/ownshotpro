@@ -23,13 +23,18 @@ import {
   ProductOptions,
 } from "@/types";
 import { ProductOptionsForm } from "./ProductOptionsForm";
-import { Camera, Crop, Sun, Palette, Settings2, ChevronDown } from "lucide-react";
+import { FoodOptionsForm } from "./FoodOptionsForm";
+import { OptionCardGroup, OptionCardItem } from "@/components/ui/option-card-group";
+import { FoodOptions, TransformMode, TRANSFORM_MODE_LABELS } from "@/types/food";
+import { Camera, Crop, Palette, Settings2, ChevronDown } from "lucide-react";
 
 interface OptionsFormProps {
   options: EnhanceOptions;
   onChange: (options: EnhanceOptions) => void;
   productOptions?: ProductOptions;
   onProductOptionsChange?: (options: ProductOptions) => void;
+  foodOptions?: FoodOptions;
+  onFoodOptionsChange?: (options: FoodOptions) => void;
   disabled?: boolean;
 }
 
@@ -38,6 +43,8 @@ export function OptionsForm({
   onChange,
   productOptions,
   onProductOptionsChange,
+  foodOptions,
+  onFoodOptionsChange,
   disabled
 }: OptionsFormProps) {
   const updateOption = <K extends keyof EnhanceOptions>(
@@ -49,6 +56,7 @@ export function OptionsForm({
 
   const isInterior = options.preset === "interior";
   const isProduct = options.preset === "product";
+  const isFood = options.preset === "food";
 
   return (
     <Card>
@@ -144,91 +152,75 @@ export function OptionsForm({
               </span>
               <ChevronDown className="h-4 w-4 transition-transform duration-200" />
             </CollapsibleTrigger>
-            <CollapsibleContent className="space-y-2 pt-2">
-              {/* Magazine Reshoot */}
-              <div className="flex items-start space-x-2 p-2 rounded-lg bg-muted/50 hover:bg-muted/60 transition-colors">
-                <Checkbox
-                  id="magazineReshoot"
-                  checked={options.magazineReshoot ?? true}
-                  onCheckedChange={(v) => updateOption("magazineReshoot", v === true)}
+            <CollapsibleContent className="space-y-3 pt-2">
+              {/* Transform Mode */}
+              <div className="space-y-2">
+                <Label className="text-foreground text-sm">Transform Mode</Label>
+                <OptionCardGroup
+                  items={
+                    (Object.entries(TRANSFORM_MODE_LABELS) as [
+                      TransformMode,
+                      { title: string; description: string }
+                    ][]).map(([value, { title, description }]) => ({
+                      value,
+                      title,
+                      description,
+                    }))
+                  }
+                  value={
+                    !options.magazineReshoot
+                      ? "retouch"
+                      : !options.allowStyling
+                      ? "reshoot"
+                      : "reshoot_styled"
+                  }
+                  onChange={(value: TransformMode) => {
+                    if (value === "retouch") {
+                      updateOption("magazineReshoot", false);
+                      updateOption("allowStyling", false);
+                    } else if (value === "reshoot") {
+                      updateOption("magazineReshoot", true);
+                      updateOption("allowStyling", false);
+                    } else {
+                      updateOption("magazineReshoot", true);
+                      updateOption("allowStyling", true);
+                    }
+                  }}
                   disabled={disabled}
-                  className="mt-0.5"
+                  columns={1}
+                  size="md"
+                  aria-label="Interior transform mode"
                 />
-                <div>
-                  <Label htmlFor="magazineReshoot" className="text-sm font-medium cursor-pointer text-foreground">
-                    Magazine Reshoot
-                  </Label>
-                  <p className="text-xs text-muted-foreground leading-tight">
-                    Better straight-on perspective
-                  </p>
-                </div>
               </div>
 
-              {/* Creative Crop */}
-              <div className="flex items-start space-x-2 p-2 rounded-lg bg-muted/50 hover:bg-muted/60 transition-colors">
-                <Checkbox
-                  id="creativeCrop"
-                  checked={options.creativeCrop ?? false}
-                  onCheckedChange={(v) => updateOption("creativeCrop", v === true)}
-                  disabled={disabled}
-                  className="mt-0.5"
-                />
-                <div>
-                  <Label htmlFor="creativeCrop" className="text-sm font-medium cursor-pointer text-foreground flex items-center gap-1.5">
-                    <Crop className="w-3 h-3" />
-                    Creative Crop
-                  </Label>
-                  <p className="text-xs text-muted-foreground leading-tight">
-                    Magazine-style composition
-                  </p>
+              {/* Creative Crop - Show only for reshoot modes */}
+              {options.magazineReshoot && (
+                <div className="flex items-start space-x-2 p-2 rounded-lg bg-muted/50 hover:bg-muted/60 transition-colors">
+                  <Checkbox
+                    id="creativeCrop"
+                    checked={options.creativeCrop ?? false}
+                    onCheckedChange={(v) => updateOption("creativeCrop", v === true)}
+                    disabled={disabled}
+                    className="mt-0.5"
+                  />
+                  <div>
+                    <Label htmlFor="creativeCrop" className="text-sm font-medium cursor-pointer text-foreground flex items-center gap-1.5">
+                      <Crop className="w-3 h-3" />
+                      Creative Crop
+                    </Label>
+                    <p className="text-xs text-muted-foreground leading-tight">
+                      Magazine-style composition
+                    </p>
+                  </div>
                 </div>
-              </div>
+              )}
 
-              {/* HDR Windows */}
-              <div className="flex items-start space-x-2 p-2 rounded-lg bg-muted/50 hover:bg-muted/60 transition-colors">
-                <Checkbox
-                  id="hdrWindows"
-                  checked={options.hdrWindows ?? false}
-                  onCheckedChange={(v) => updateOption("hdrWindows", v === true)}
-                  disabled={disabled}
-                  className="mt-0.5"
-                />
-                <div>
-                  <Label htmlFor="hdrWindows" className="text-sm font-medium cursor-pointer text-foreground flex items-center gap-1.5">
-                    <Sun className="w-3 h-3" />
-                    HDR Windows
-                  </Label>
-                  <p className="text-xs text-muted-foreground leading-tight">
-                    Recover window detail
-                  </p>
-                </div>
-              </div>
-
-              {/* Allow Styling */}
-              <div className="flex items-start space-x-2 p-2 rounded-lg bg-muted/50 hover:bg-muted/60 transition-colors">
-                <Checkbox
-                  id="allowStyling"
-                  checked={options.allowStyling ?? false}
-                  onCheckedChange={(v) => updateOption("allowStyling", v === true)}
-                  disabled={disabled}
-                  className="mt-0.5"
-                />
-                <div>
-                  <Label htmlFor="allowStyling" className="text-sm font-medium cursor-pointer text-foreground flex items-center gap-1.5">
-                    <Palette className="w-3 h-3" />
-                    Styling Props
-                  </Label>
-                  <p className="text-xs text-muted-foreground leading-tight">
-                    Add decor (flowers, books)
-                  </p>
-                </div>
-              </div>
-
-              {/* Prop Suggestions */}
+              {/* Prop Suggestions - Show only for reshoot_styled mode */}
               {options.allowStyling && (
-                <div className="ml-5 space-y-1.5">
-                  <Label htmlFor="propSuggestions" className="text-xs text-foreground">
-                    Prop suggestions
+                <div className="space-y-1.5">
+                  <Label htmlFor="propSuggestions" className="text-xs text-foreground flex items-center gap-1.5">
+                    <Palette className="w-3 h-3" />
+                    Prop Suggestions
                   </Label>
                   <Input
                     id="propSuggestions"
@@ -242,6 +234,17 @@ export function OptionsForm({
               )}
             </CollapsibleContent>
           </Collapsible>
+        )}
+
+        {/* Food-specific options */}
+        {isFood && foodOptions && onFoodOptionsChange && (
+          <div className="pt-3 border-t border-border">
+            <FoodOptionsForm
+              options={foodOptions}
+              onChange={onFoodOptionsChange}
+              disabled={disabled}
+            />
+          </div>
         )}
 
         {/* Strength Slider - Hidden for Product (has own controls) */}

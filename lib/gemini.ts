@@ -50,8 +50,9 @@ export async function generateEnhancedImage(
     };
 
     // Build config
+    // Include both TEXT and IMAGE to allow model reasoning about edits
     const config: Record<string, unknown> = {
-      responseModalities: ["Image"],
+      responseModalities: ["TEXT", "IMAGE"],
     };
 
     // Add image config if we have specific requirements

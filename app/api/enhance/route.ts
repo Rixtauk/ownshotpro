@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { generateEnhancedImage } from "@/lib/gemini";
 import { buildEnhancementPrompt, buildInteriorPrompt } from "@/lib/promptBuilder";
 import { buildProductPrompt } from "@/lib/productPromptBuilder";
+import { buildFoodPromptFromOptions } from "@/lib/foodPromptBuilder";
 import { validateImageFile } from "@/lib/validators";
-import { Preset, AspectRatio, ImageSize, ProductOptions, DEFAULT_PRODUCT_OPTIONS } from "@/types";
+import { Preset, AspectRatio, ImageSize, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS, TransformMode } from "@/types";
 
 // Force Node.js runtime (not Edge)
 export const runtime = "nodejs";
@@ -54,23 +55,43 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Food-specific options
+    const foodOptionsStr = formData.get("foodOptions") as string | null;
+    let foodOptions: FoodOptions = DEFAULT_FOOD_OPTIONS;
+    if (foodOptionsStr) {
+      try {
+        foodOptions = JSON.parse(foodOptionsStr);
+      } catch (e) {
+        console.error("Failed to parse food options:", e);
+      }
+    }
+
+    // Derive transform mode for interior from legacy flags
+    let transformMode: TransformMode = "retouch";
+    if (magazineReshoot) {
+      transformMode = allowStyling ? "reshoot_styled" : "reshoot";
+    }
+
     // Read file as ArrayBuffer then convert to base64
     const arrayBuffer = await file.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString("base64");
 
     let prompt: string;
 
-    if (preset === "product") {
+    if (preset === "food") {
+      // Food mode with professional food photography controls
+      console.log(`Processing Food (mode: ${foodOptions.transformMode}, shot: ${foodOptions.shotType}, lighting: ${foodOptions.lighting}, foodBoost: ${foodOptions.foodBoost}, strength: ${foodOptions.strength})...`);
+      prompt = buildFoodPromptFromOptions(foodOptions);
+      console.log("Food prompt:\n", prompt);
+    } else if (preset === "product") {
       // Product mode with studio-quality controls
       console.log(`Processing Product (shot: ${productOptions.shotType}, preset: ${productOptions.quickPreset}, labelProtection: ${productOptions.labelProtection.enabled})...`);
       prompt = buildProductPrompt(productOptions);
     } else if (preset === "interior") {
       // Single-pass Interior processing with geometry-first prompt
-      console.log(`Processing Interior (magazineReshoot: ${magazineReshoot}, creativeCrop: ${creativeCrop}, styling: ${allowStyling}, hdrWindows: ${hdrWindows})...`);
+      console.log(`Processing Interior (mode: ${transformMode}, creativeCrop: ${creativeCrop})...`);
       prompt = buildInteriorPrompt({
-        magazineReshoot,
-        allowStyling,
-        hdrWindows,
+        transformMode,
         creativeCrop,
         propSuggestions: propSuggestions || undefined,
       });

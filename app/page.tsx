@@ -5,7 +5,12 @@ import { Dropzone } from "@/components/Dropzone";
 import { OptionsForm } from "@/components/OptionsForm";
 import { MainCanvas } from "@/components/MainCanvas";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS } from "@/types";
+import { WizardStepIndicator } from "@/components/wizard/WizardStepIndicator";
+import { UploadScreen } from "@/components/screens/UploadScreen";
+import { ConfigureScreen } from "@/components/screens/ConfigureScreen";
+import { ResultsScreen } from "@/components/screens/ResultsScreen";
+import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS } from "@/types";
+import { WizardStep } from "@/types/wizard";
 import { validateImageFile } from "@/lib/validators";
 import { applyProductPreset } from "@/lib/productPresets";
 import { compressImage } from "@/lib/imageCompression";
@@ -24,6 +29,7 @@ const DEFAULT_OPTIONS: EnhanceOptions = {
 };
 
 export default function Home() {
+  const [wizardStep, setWizardStep] = useState<WizardStep>('upload');
   const [file, setFile] = useState<File | null>(null);
   const [originalPreview, setOriginalPreview] = useState<string | null>(null);
   const [enhancedImage, setEnhancedImage] = useState<string | null>(null);
@@ -31,6 +37,20 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [options, setOptions] = useState<EnhanceOptions>(DEFAULT_OPTIONS);
   const [productOptions, setProductOptions] = useState<ProductOptions>(DEFAULT_PRODUCT_OPTIONS);
+  const [foodOptions, setFoodOptions] = useState<FoodOptions>(DEFAULT_FOOD_OPTIONS);
+
+  // Wizard navigation functions
+  const goToUpload = () => {
+    setWizardStep('upload');
+  };
+
+  const goToConfigure = () => {
+    if (file) setWizardStep('configure');
+  };
+
+  const goToResults = () => {
+    setWizardStep('results');
+  };
 
   // Handle product options change, including preset changes
   const handleProductOptionsChange = useCallback((newOptions: ProductOptions) => {
@@ -69,6 +89,10 @@ export default function Home() {
 
     setIsLoading(true);
     setError(null);
+    setEnhancedImage(null); // Clear previous result
+
+    // Navigate to results immediately to show loading state
+    goToResults();
 
     try {
       const formData = new FormData();
@@ -88,6 +112,14 @@ export default function Home() {
       if (options.preset === "product") {
         formData.append("productOptions", JSON.stringify(productOptions));
       }
+
+      // Add food options when in food mode
+      if (options.preset === "food") {
+        formData.append("foodOptions", JSON.stringify(foodOptions));
+      }
+
+      // Add transform mode for interior
+      formData.append("transformMode", options.transformMode ?? "reshoot");
 
       const response = await fetch("/api/enhance", {
         method: "POST",
@@ -130,6 +162,17 @@ export default function Home() {
         productOptions.shotType.charAt(0).toUpperCase() + productOptions.shotType.slice(1),
         productOptions.labelProtection.enabled && "Label Protected",
       ].filter(Boolean).join(" · ")
+    : options.preset === "food"
+    ? [
+        "Food",
+        foodOptions.foodBoost !== "off" &&
+          (foodOptions.foodBoost === "plating" ? "Plating Polish" :
+           foodOptions.foodBoost === "appetising" ? "Appetising" :
+           foodOptions.foodBoost === "hero" ? "Hero Restyle" : null),
+        foodOptions.shotType.split("-").map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+        foodOptions.styling.addSteam && "Steam",
+        foodOptions.styling.addCondensation && "Condensation",
+      ].filter(Boolean).join(" · ")
     : [
         options.preset.charAt(0).toUpperCase() + options.preset.slice(1),
         options.imageSize,
@@ -157,51 +200,49 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Workspace */}
-      <main className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-6 px-6 py-6 lg:grid-cols-[340px_1fr]">
-        {/* Left: Sidebar */}
-        <aside className="space-y-4 lg:sticky lg:top-20 lg:h-[calc(100vh-5.5rem)] lg:overflow-auto lg:pr-2 lg:scrollbar-thin">
-          {/* Upload */}
-          <Dropzone
-            onFileSelect={handleFileSelect}
-            disabled={isLoading}
-            currentFile={file}
-          />
+      {/* Wizard Step Indicator */}
+      <WizardStepIndicator currentStep={wizardStep} />
 
-          {/* Options */}
-          <OptionsForm
+      {/* Wizard Content */}
+      <main className="mx-auto max-w-screen-2xl px-6 py-6">
+        {wizardStep === 'upload' && (
+          <UploadScreen
+            file={file}
+            originalPreview={originalPreview}
+            onFileSelect={handleFileSelect}
+            onContinue={goToConfigure}
+            disabled={isLoading}
+          />
+        )}
+
+        {wizardStep === 'configure' && (
+          <ConfigureScreen
+            file={file}
+            originalPreview={originalPreview}
             options={options}
-            onChange={setOptions}
+            onOptionsChange={setOptions}
             productOptions={productOptions}
             onProductOptionsChange={handleProductOptionsChange}
-            disabled={isLoading}
+            foodOptions={foodOptions}
+            onFoodOptionsChange={setFoodOptions}
+            onChangeImage={goToUpload}
+            onGenerate={handleGenerate}
+            isLoading={isLoading}
           />
+        )}
 
-          {/* Mobile: sticky generate */}
-          <div className="lg:hidden">
-            <button
-              onClick={handleGenerate}
-              disabled={!file || isLoading}
-              className="h-12 w-full rounded-xl bg-primary text-primary-foreground font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? "Enhancing..." : "Boost Your Image"}
-            </button>
-          </div>
-        </aside>
-
-        {/* Right: Canvas */}
-        <section className="flex flex-col gap-4">
-          <MainCanvas
+        {wizardStep === 'results' && originalPreview && (
+          <ResultsScreen
             originalUrl={originalPreview}
             enhancedUrl={enhancedImage}
             isLoading={isLoading}
             error={error}
-            onGenerate={handleGenerate}
             onDownload={handleDownload}
-            canGenerate={!!file}
+            onStartOver={goToUpload}
+            onAdjustSettings={goToConfigure}
             settingsSummary={settingsSummary}
           />
-        </section>
+        )}
       </main>
     </div>
   );

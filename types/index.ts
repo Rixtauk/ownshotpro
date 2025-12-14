@@ -1,8 +1,13 @@
 // Preset types
-export type Preset = "interior" | "product" | "people" | "general";
+export type Preset = "interior" | "product" | "people" | "general" | "food";
 
 // Re-export product types
 export * from "./product";
+
+// Import and re-export food types (import TransformMode explicitly for use in this file)
+import type { TransformMode as TM } from "./food";
+export type TransformMode = TM;
+export * from "./food";
 
 // Aspect ratio options
 export type AspectRatio = "match" | "1:1" | "4:5" | "16:9" | "3:2" | "9:16";
@@ -20,7 +25,9 @@ export interface EnhanceOptions {
   imageSize: ImageSize;
   strength: number; // 0-100
   strictPreservation: boolean; // Legacy - kept for non-interior presets
-  // Interior-specific options
+  // Shared transform mode (Interior & Food)
+  transformMode?: TransformMode;
+  // Interior-specific options (legacy - kept for backward compatibility)
   magazineReshoot?: boolean;  // Enable reshoot mode (geometry + composition)
   allowStyling?: boolean;     // Enable styling additions (props)
   hdrWindows?: boolean;       // Recover window/exterior detail

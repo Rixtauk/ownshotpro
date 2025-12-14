@@ -49,6 +49,22 @@ export const PRESETS: Record<Preset, PresetDefinition> = {
       "preserve facial expressions exactly",
     ],
   },
+  food: {
+    id: "food",
+    label: "Food",
+    description: "Professional food photography for menus and social media",
+    focusAreas: [
+      "appetizing presentation",
+      "accurate food colors",
+      "texture detail",
+      "clean plating",
+    ],
+    styleHints: [
+      "enhance freshness",
+      "maintain brand truth",
+      "restaurant quality",
+    ],
+  },
   general: {
     id: "general",
     label: "General",

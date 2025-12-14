@@ -1,4 +1,4 @@
-import { Preset, PresetDefinition, EnhanceOptions } from "@/types";
+import { Preset, PresetDefinition, EnhanceOptions, TransformMode } from "@/types";
 import { PRESETS } from "./presets";
 
 interface PromptParams {
@@ -8,10 +8,8 @@ interface PromptParams {
 }
 
 interface InteriorPromptParams {
-  magazineReshoot: boolean;
-  allowStyling: boolean;
-  hdrWindows: boolean;
-  creativeCrop: boolean;
+  transformMode: TransformMode;
+  creativeCrop?: boolean;
   propSuggestions?: string;
 }
 
@@ -22,9 +20,7 @@ export function buildEnhancementPrompt(params: PromptParams): string {
   if (preset === "interior") {
     // Fallback for non-interior code paths
     return buildInteriorPrompt({
-      magazineReshoot: false,
-      allowStyling: false,
-      hdrWindows: false,
+      transformMode: "retouch",
       creativeCrop: false,
     });
   }
@@ -38,18 +34,34 @@ export function buildEnhancementPrompt(params: PromptParams): string {
 // =============================================================================
 
 export function buildInteriorPrompt(params: InteriorPromptParams): string {
-  const { magazineReshoot, allowStyling, hdrWindows, creativeCrop, propSuggestions } = params;
+  const { transformMode, creativeCrop, propSuggestions } = params;
 
   let parts: string[] = [];
 
-  if (magazineReshoot) {
-    // Aggressive reshoot - actually change the camera position
-    parts.push("Recreate this interior scene as a professional design magazine photo.");
-    parts.push("IMPORTANT: Reshoot from a perfectly straight-on, centered camera position facing the main feature.");
-    parts.push("Extend the frame to show more of the room - a wider, more balanced composition.");
-  } else {
-    parts.push("Edit this interior photo for a design magazine.");
-    parts.push("Fix the geometry: straighten the horizon, make all vertical lines perfectly vertical.");
+  // Transform mode determines the approach
+  switch (transformMode) {
+    case "retouch":
+      parts.push("Edit this interior photo for a design magazine.");
+      parts.push("IMPORTANT: Maintain the EXACT camera angle and composition. Polish the existing shot only.");
+      parts.push("Fix the geometry: straighten the horizon, make all vertical lines perfectly vertical.");
+      break;
+
+    case "reshoot":
+      parts.push("Recreate this interior scene as a professional design magazine photo.");
+      parts.push("IMPORTANT: Reshoot from a perfectly straight-on, centered camera position facing the main feature.");
+      parts.push("Extend the frame to show more of the room - a wider, more balanced composition.");
+      break;
+
+    case "reshoot_styled":
+      parts.push("Recreate this interior scene as a professional design magazine photo with full styling.");
+      parts.push("IMPORTANT: Reshoot from a perfectly straight-on, centered camera position facing the main feature.");
+      parts.push("Extend the frame to show more of the room - a wider, more balanced composition.");
+      if (propSuggestions && propSuggestions.trim()) {
+        parts.push(`Add these items: ${propSuggestions.trim()}.`);
+      } else {
+        parts.push("Add tasteful styling: decorative objects, books, plants, artwork, rugs - whatever elevates the scene.");
+      }
+      break;
   }
 
   if (creativeCrop) {
@@ -59,21 +71,11 @@ export function buildInteriorPrompt(params: InteriorPromptParams): string {
   // Lighting
   parts.push("Apply clean, bright editorial lighting with neutral white balance.");
 
-  if (hdrWindows) {
-    parts.push("Show detail through the windows - recover the exterior view naturally.");
-  }
+  // HDR is now automatic - always recover window detail
+  parts.push("Automatically recover detail in highlights and through windows - show the exterior view naturally.");
 
   // Grade
   parts.push("Premium matte film look with lifted blacks and smooth highlights.");
-
-  // Styling
-  if (allowStyling) {
-    if (propSuggestions && propSuggestions.trim()) {
-      parts.push(`Add these items: ${propSuggestions.trim()}.`);
-    } else {
-      parts.push("Add tasteful styling: decorative objects, books, plants, artwork, rugs - whatever elevates the scene.");
-    }
-  }
 
   parts.push("Photorealistic quality. No text or watermarks.");
 
