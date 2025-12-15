@@ -81,6 +81,8 @@ import {
   LIFESTYLE_SCENE_LABELS,
 } from "@/types/product";
 import { cn } from "@/lib/utils";
+import { AppContainer } from "@/components/app-container";
+import { MotionButton } from "@/components/ui/motion-button";
 
 interface ConfigureScreenProps {
   file: File | null;
@@ -221,8 +223,8 @@ export function ConfigureScreen({
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-4 py-8">
-      <div className="flex flex-col lg:flex-row gap-6">
+    <AppContainer className="max-w-6xl py-8">
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Left Sidebar - Image Preview */}
         <aside className="hidden lg:block lg:w-72 shrink-0">
           <div className="sticky top-24 space-y-4">
@@ -268,17 +270,17 @@ export function ConfigureScreen({
         {/* Main Content - Configuration Cards */}
         <main className="flex-1 space-y-6">
           {/* Header */}
-          <div className="space-y-2">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+          <div className="space-y-1">
+            <h1 className="text-title text-foreground">
               Configure Enhancement
             </h1>
-            <p className="text-sm md:text-base text-muted-foreground">
+            <p className="text-subtitle">
               Customize your image transformation settings
             </p>
           </div>
 
           {/* Two-column card grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Card 1: Category Selection */}
             <ConfigCard title="Category" icon={Settings2}>
               <div className="space-y-1.5">
@@ -1278,18 +1280,18 @@ export function ConfigureScreen({
 
           {/* Generate Button */}
           <div className="flex justify-end pt-4">
-            <Button
+            <MotionButton
               onClick={onGenerate}
               disabled={!file || isLoading}
               size="lg"
-              className="w-full lg:w-auto min-w-48 h-11 rounded-xl font-semibold"
+              className="w-full lg:w-auto min-w-48"
             >
               <Sparkles className="w-4 h-4 mr-2" />
               {isLoading ? "Generating..." : "Generate Enhancement"}
-            </Button>
+            </MotionButton>
           </div>
         </main>
       </div>
-    </div>
+    </AppContainer>
   );
 }

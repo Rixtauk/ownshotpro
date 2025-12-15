@@ -3,8 +3,10 @@
 import { useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import Image from "next/image";
-import { Upload, X, ImageIcon } from "lucide-react";
+import { Upload, X, ImageIcon, FileImage } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { MotionButton } from "@/components/ui/motion-button";
+import { AppContainer } from "@/components/app-container";
 import { cn } from "@/lib/utils";
 
 interface UploadScreenProps {
@@ -46,14 +48,14 @@ export function UploadScreen({
     });
 
   return (
-    <div className="w-full max-w-2xl mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-col items-center gap-6">
+    <AppContainer className="max-w-3xl py-4 md:py-6">
+      <div className="flex flex-col items-center gap-5">
         {/* Header */}
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl md:text-3xl font-bold text-foreground">
+        <div className="text-center space-y-1">
+          <h1 className="text-title text-foreground">
             Upload Your Image
           </h1>
-          <p className="text-sm md:text-base text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
             Choose an image to enhance with AI-powered transformation
           </p>
         </div>
@@ -75,21 +77,28 @@ export function UploadScreen({
 
             {!file ? (
               // Empty state - show upload prompt
-              <div className="p-8 md:p-12 text-center">
+              <div className="p-6 md:p-8 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-primary/10 flex items-center justify-center">
                     <Upload className="w-8 h-8 md:w-10 md:h-10 text-primary" />
                   </div>
-                  <div>
+                  <div className="space-y-1">
                     <p className="font-semibold text-foreground text-base md:text-lg">
                       {isDragActive ? "Drop your image here" : "Drag & drop an image"}
                     </p>
-                    <p className="text-sm text-muted-foreground mt-1">
+                    <p className="text-sm text-muted-foreground">
                       or click to browse
                     </p>
-                    <p className="text-xs text-muted-foreground mt-2">
-                      PNG, JPEG, WebP - max 8MB
-                    </p>
+                  </div>
+
+                  {/* Supported formats row */}
+                  <div className="flex items-center gap-4 pt-2">
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <FileImage className="w-3.5 h-3.5" />
+                      <span>PNG, JPEG, WebP</span>
+                    </div>
+                    <span className="text-muted-foreground/50">·</span>
+                    <span className="text-xs text-muted-foreground">Max 8MB</span>
                   </div>
                 </div>
               </div>
@@ -97,7 +106,7 @@ export function UploadScreen({
               // File uploaded - show preview inside the dropzone
               <div className="relative">
                 {/* Image preview */}
-                <div className="relative w-full aspect-[4/3] bg-muted/50">
+                <div className="relative w-full aspect-[16/10] bg-muted/50">
                   {originalPreview && (
                     <Image
                       src={originalPreview}
@@ -110,7 +119,7 @@ export function UploadScreen({
                 </div>
 
                 {/* File info bar */}
-                <div className="p-3 border-t border-border bg-card/50 backdrop-blur-sm">
+                <div className="p-4 border-t border-border bg-card/50 backdrop-blur-sm">
                   <div className="flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <ImageIcon className="w-5 h-5 text-muted-foreground shrink-0" />
@@ -152,15 +161,15 @@ export function UploadScreen({
         </div>
 
         {/* Continue button */}
-        <Button
+        <MotionButton
           onClick={onContinue}
           disabled={!file || disabled}
           size="lg"
-          className="w-full h-12 rounded-xl font-semibold text-base"
+          className="w-full max-w-md"
         >
           Continue to Settings
-        </Button>
+        </MotionButton>
       </div>
-    </div>
+    </AppContainer>
   );
 }

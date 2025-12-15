@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { Dropzone } from "@/components/Dropzone";
-import { OptionsForm } from "@/components/OptionsForm";
-import { MainCanvas } from "@/components/MainCanvas";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WizardStepIndicator } from "@/components/wizard/WizardStepIndicator";
 import { UploadScreen } from "@/components/screens/UploadScreen";
 import { ConfigureScreen } from "@/components/screens/ConfigureScreen";
 import { ResultsScreen } from "@/components/screens/ResultsScreen";
+import { MotionLayout } from "@/components/motion-layout";
+import { EnhanceProgressDialog } from "@/components/enhance-progress-dialog";
+import { HistoryItem } from "@/components/history-filmstrip";
 import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS } from "@/types";
 import { WizardStep } from "@/types/wizard";
 import { validateImageFile } from "@/lib/validators";
@@ -38,6 +38,11 @@ export default function Home() {
   const [options, setOptions] = useState<EnhanceOptions>(DEFAULT_OPTIONS);
   const [productOptions, setProductOptions] = useState<ProductOptions>(DEFAULT_PRODUCT_OPTIONS);
   const [foodOptions, setFoodOptions] = useState<FoodOptions>(DEFAULT_FOOD_OPTIONS);
+  const [showProgressDialog, setShowProgressDialog] = useState(false);
+
+  // History state for iterations
+  const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [activeHistoryId, setActiveHistoryId] = useState<string | undefined>();
 
   // Wizard navigation functions
   const goToUpload = () => {
@@ -75,6 +80,8 @@ export default function Home() {
 
     setError(null);
     setEnhancedImage(null);
+    setHistory([]);
+    setActiveHistoryId(undefined);
 
     // Compress large images (especially from mobile cameras)
     const processedFile = await compressImage(selectedFile);
@@ -89,7 +96,7 @@ export default function Home() {
 
     setIsLoading(true);
     setError(null);
-    setEnhancedImage(null); // Clear previous result
+    setShowProgressDialog(true);
 
     // Navigate to results immediately to show loading state
     goToResults();
@@ -134,19 +141,39 @@ export default function Home() {
       const blob = await response.blob();
       const imageUrl = URL.createObjectURL(blob);
       setEnhancedImage(imageUrl);
+
+      // Add to history
+      const historyItem: HistoryItem = {
+        id: `gen-${Date.now()}`,
+        src: imageUrl,
+        label: `Generation ${history.length + 1}`,
+        timestamp: Date.now(),
+      };
+      setHistory(prev => [...prev, historyItem]);
+      setActiveHistoryId(historyItem.id);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Enhancement failed";
       setError(message);
     } finally {
       setIsLoading(false);
+      setShowProgressDialog(false);
     }
   };
 
-  const handleDownload = () => {
+  const handleHistorySelect = (id: string) => {
+    const item = history.find(h => h.id === id);
+    if (item) {
+      setEnhancedImage(item.src);
+      setActiveHistoryId(id);
+    }
+  };
+
+  const handleDownload = (format: "png" | "jpg" | "webp" = "png") => {
     if (!enhancedImage) return;
+
     const link = document.createElement("a");
     link.href = enhancedImage;
-    link.download = `ownshot-enhanced-${Date.now()}.png`;
+    link.download = `ownshot-enhanced-${Date.now()}.${format}`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -203,47 +230,55 @@ export default function Home() {
       {/* Wizard Step Indicator */}
       <WizardStepIndicator currentStep={wizardStep} />
 
-      {/* Wizard Content */}
-      <main className="mx-auto max-w-screen-2xl px-6 py-6">
-        {wizardStep === 'upload' && (
-          <UploadScreen
-            file={file}
-            originalPreview={originalPreview}
-            onFileSelect={handleFileSelect}
-            onContinue={goToConfigure}
-            disabled={isLoading}
-          />
-        )}
+      {/* Wizard Content with Motion */}
+      <main className="mx-auto max-w-screen-2xl">
+        <MotionLayout layoutKey={wizardStep}>
+          {wizardStep === 'upload' && (
+            <UploadScreen
+              file={file}
+              originalPreview={originalPreview}
+              onFileSelect={handleFileSelect}
+              onContinue={goToConfigure}
+              disabled={isLoading}
+            />
+          )}
 
-        {wizardStep === 'configure' && (
-          <ConfigureScreen
-            file={file}
-            originalPreview={originalPreview}
-            options={options}
-            onOptionsChange={setOptions}
-            productOptions={productOptions}
-            onProductOptionsChange={handleProductOptionsChange}
-            foodOptions={foodOptions}
-            onFoodOptionsChange={setFoodOptions}
-            onChangeImage={goToUpload}
-            onGenerate={handleGenerate}
-            isLoading={isLoading}
-          />
-        )}
+          {wizardStep === 'configure' && (
+            <ConfigureScreen
+              file={file}
+              originalPreview={originalPreview}
+              options={options}
+              onOptionsChange={setOptions}
+              productOptions={productOptions}
+              onProductOptionsChange={handleProductOptionsChange}
+              foodOptions={foodOptions}
+              onFoodOptionsChange={setFoodOptions}
+              onChangeImage={goToUpload}
+              onGenerate={handleGenerate}
+              isLoading={isLoading}
+            />
+          )}
 
-        {wizardStep === 'results' && originalPreview && (
-          <ResultsScreen
-            originalUrl={originalPreview}
-            enhancedUrl={enhancedImage}
-            isLoading={isLoading}
-            error={error}
-            onDownload={handleDownload}
-            onStartOver={goToUpload}
-            onAdjustSettings={goToConfigure}
-            settingsSummary={settingsSummary}
-          />
-        )}
+          {wizardStep === 'results' && originalPreview && (
+            <ResultsScreen
+              originalUrl={originalPreview}
+              enhancedUrl={enhancedImage}
+              isLoading={isLoading}
+              error={error}
+              onDownload={handleDownload}
+              onStartOver={goToUpload}
+              onAdjustSettings={goToConfigure}
+              settingsSummary={settingsSummary}
+              history={history}
+              activeHistoryId={activeHistoryId}
+              onHistorySelect={handleHistorySelect}
+            />
+          )}
+        </MotionLayout>
       </main>
+
+      {/* Enhancement Progress Dialog */}
+      <EnhanceProgressDialog open={showProgressDialog} />
     </div>
   );
 }

@@ -13,7 +13,7 @@ export function WizardStepIndicator({ currentStep }: WizardStepIndicatorProps) {
   const currentStepNumber = WIZARD_STEPS.find((s) => s.id === currentStep)?.number ?? 1;
 
   return (
-    <div className="flex items-center justify-center gap-2 md:gap-4">
+    <div className="flex items-center justify-center gap-2 md:gap-4 py-4">
       {WIZARD_STEPS.map((step, index) => {
         const isCompleted = step.number < currentStepNumber;
         const isCurrent = step.number === currentStepNumber;
