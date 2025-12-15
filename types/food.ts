@@ -95,12 +95,12 @@ export const FOOD_BOOST_LABELS: Record<FoodBoost, { title: string; description: 
 
 // Default food options
 export const DEFAULT_FOOD_OPTIONS: FoodOptions = {
-  transformMode: "retouch",
+  transformMode: "reshoot",
   shotType: "45-degree",
   lighting: "natural",
   surface: "wood",
-  foodBoost: "off",
-  strength: 60,
+  foodBoost: "appetising",
+  strength: 70,
   finish: {
     matteCrisp: 55,
     saturation: 0

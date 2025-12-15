@@ -549,71 +549,26 @@ export function ConfigureScreen({
                   </div>
                 </ConfigCard>
 
-                {/* Finish Controls */}
-                <ConfigCard title="Finish Controls" icon={Sparkles}>
-                  <div className="space-y-4">
-                    {/* Strength */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label className="text-sm">Strength</Label>
-                        <span className="text-xs text-muted-foreground">{foodOptions.strength}%</span>
-                      </div>
-                      <Slider
-                        value={[foodOptions.strength]}
-                        onValueChange={([value]) =>
-                          onFoodOptionsChange({ ...foodOptions, strength: value })
-                        }
-                        min={0}
-                        max={100}
-                        step={5}
-                        disabled={isLoading}
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground px-1">
-                        <span>Subtle</span>
-                        <span>Maximum</span>
-                      </div>
+                {/* Enhancement Strength */}
+                <ConfigCard title="Enhancement" icon={Sparkles}>
+                  <div className="space-y-2">
+                    <div className="flex justify-between">
+                      <Label className="text-sm">Strength</Label>
+                      <span className="text-xs text-muted-foreground">{foodOptions.strength}%</span>
                     </div>
-
-                    {/* Matte/Crisp */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label className="text-sm">Matte / Crisp</Label>
-                        <span className="text-xs text-muted-foreground">{foodOptions.finish.matteCrisp}</span>
-                      </div>
-                      <Slider
-                        value={[foodOptions.finish.matteCrisp]}
-                        onValueChange={([value]) => updateFoodNested("finish", { matteCrisp: value })}
-                        min={0}
-                        max={100}
-                        step={1}
-                        disabled={isLoading}
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground px-1">
-                        <span>Matte</span>
-                        <span>Crisp</span>
-                      </div>
-                    </div>
-
-                    {/* Saturation */}
-                    <div className="space-y-2">
-                      <div className="flex justify-between">
-                        <Label className="text-sm">Saturation</Label>
-                        <span className="text-xs text-muted-foreground">
-                          {foodOptions.finish.saturation > 0 ? "+" : ""}{foodOptions.finish.saturation}
-                        </span>
-                      </div>
-                      <Slider
-                        value={[foodOptions.finish.saturation]}
-                        onValueChange={([value]) => updateFoodNested("finish", { saturation: value })}
-                        min={-20}
-                        max={20}
-                        step={1}
-                        disabled={isLoading}
-                      />
-                      <div className="flex justify-between text-xs text-muted-foreground px-1">
-                        <span>-20</span>
-                        <span>+20</span>
-                      </div>
+                    <Slider
+                      value={[foodOptions.strength]}
+                      onValueChange={([value]) =>
+                        onFoodOptionsChange({ ...foodOptions, strength: value })
+                      }
+                      min={0}
+                      max={100}
+                      step={5}
+                      disabled={isLoading}
+                    />
+                    <div className="flex justify-between text-xs text-muted-foreground px-1">
+                      <span>Subtle</span>
+                      <span>Maximum</span>
                     </div>
                   </div>
                 </ConfigCard>
