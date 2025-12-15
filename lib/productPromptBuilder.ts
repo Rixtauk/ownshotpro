@@ -9,6 +9,7 @@ import type {
   ShadowType,
   ReflectionType,
   ClothType,
+  LifestyleScene,
 } from "@/types/product";
 
 /**
@@ -116,6 +117,108 @@ const REFLECTION_DESCRIPTIONS: Record<ReflectionType, string> = {
   subtle: "subtle reflection on surface beneath product",
   strong: "strong mirror-like reflection",
 };
+
+/**
+ * Lifestyle scene variations for variety on regeneration
+ * Each scene has environment, props, and mood options
+ */
+type LifestyleSceneKey = Exclude<LifestyleScene, "random">;
+
+interface LifestyleSceneData {
+  environment: string;
+  props: string[];
+  moods: string[];
+}
+
+const LIFESTYLE_SCENES: Record<LifestyleSceneKey, LifestyleSceneData> = {
+  kitchen_counter: {
+    environment: "on a clean kitchen counter with natural daylight streaming through a window",
+    props: ["fresh herbs in a small pot", "wooden cutting board", "ceramic bowl", "linen kitchen towel", "olive oil bottle"],
+    moods: ["bright morning light", "warm afternoon glow", "soft natural daylight"],
+  },
+  office_desk: {
+    environment: "on a modern minimalist office desk with ambient workspace lighting",
+    props: ["leather notebook", "elegant pen", "coffee cup", "small succulent plant", "wireless earbuds case"],
+    moods: ["focused daylight from window", "warm afternoon ambiance", "soft diffused natural light"],
+  },
+  outdoor_cafe: {
+    environment: "on a charming cafe table with dappled sunlight filtering through foliage",
+    props: ["espresso cup and saucer", "croissant on plate", "folded newspaper", "designer sunglasses", "small flower vase"],
+    moods: ["golden hour warmth", "bright morning sunshine", "soft afternoon glow"],
+  },
+  cozy_home: {
+    environment: "on a soft knit blanket or throw in a cozy, inviting living space",
+    props: ["scented candle", "open book", "warm mug of tea", "reading glasses", "soft wool texture"],
+    moods: ["cozy evening lamplight", "soft morning light", "warm golden hour"],
+  },
+  bathroom_shelf: {
+    environment: "on a pristine bathroom shelf or marble vanity with soft, spa-like lighting",
+    props: ["small potted orchid", "folded white towel", "decorative candle", "ceramic soap dish", "eucalyptus sprig"],
+    moods: ["spa-like calm brightness", "clean natural light", "soft diffused glow"],
+  },
+  bedside_table: {
+    environment: "on a stylish bedside table with soft, intimate ambient lighting",
+    props: ["hardcover book", "small table lamp glow", "delicate plant", "jewelry dish", "alarm clock"],
+    moods: ["cozy evening warmth", "soft morning awakening", "intimate warm glow"],
+  },
+  garden_patio: {
+    environment: "on an outdoor garden table surrounded by lush greenery and natural elements",
+    props: ["potted herbs", "garden flowers in vase", "linen napkin", "terracotta pot", "gardening gloves"],
+    moods: ["golden hour sunshine", "bright natural daylight", "dappled afternoon light"],
+  },
+  living_room: {
+    environment: "on a stylish coffee table in an elegant, well-designed living room setting",
+    props: ["art book", "decorative sculpture", "small potted plant", "design magazine", "ceramic coaster"],
+    moods: ["afternoon window light", "cozy evening ambiance", "bright airy daylight"],
+  },
+};
+
+/**
+ * Get randomized lifestyle setup for variety on regeneration
+ */
+function getRandomLifestyleSetup(scene?: LifestyleScene): {
+  scene: LifestyleSceneKey;
+  environment: string;
+  mood: string;
+  props: string[];
+} {
+  const sceneKeys = Object.keys(LIFESTYLE_SCENES) as LifestyleSceneKey[];
+
+  // Pick random scene if "random" or not specified
+  const selectedScene: LifestyleSceneKey =
+    scene === "random" || !scene
+      ? sceneKeys[Math.floor(Math.random() * sceneKeys.length)]
+      : scene as LifestyleSceneKey;
+
+  const sceneData = LIFESTYLE_SCENES[selectedScene];
+
+  // Pick random mood
+  const randomMood = sceneData.moods[Math.floor(Math.random() * sceneData.moods.length)];
+
+  // Pick 2 random props
+  const shuffledProps = [...sceneData.props].sort(() => 0.5 - Math.random());
+  const randomProps = shuffledProps.slice(0, 2);
+
+  return {
+    scene: selectedScene,
+    environment: sceneData.environment,
+    mood: randomMood,
+    props: randomProps,
+  };
+}
+
+/**
+ * Build lifestyle-specific prompt with scene variations
+ */
+function buildLifestylePrompt(options: ProductOptions): string {
+  const setup = getRandomLifestyleSetup(options.lifestyleScene);
+
+  return `Lifestyle product photography ${setup.environment}.
+Atmosphere: ${setup.mood}.
+Scene includes subtle complementary props: ${setup.props.join(", ")}.
+Product remains the absolute hero - props enhance but never distract.
+Natural, editorial quality that feels authentic and aspirational.`;
+}
 
 /**
  * Build surface description including cloth specifics
@@ -316,8 +419,12 @@ export function buildProductPrompt(options: ProductOptions): string {
   // Always start with base rules
   sections.push(BASE_RULES);
 
-  // Shot type template
-  sections.push(`\nSHOT TYPE: ${SHOT_TYPE_TEMPLATES[options.shotType]}`);
+  // Shot type template - use dynamic lifestyle prompt for lifestyle shots
+  if (options.shotType === "lifestyle") {
+    sections.push(`\nSHOT TYPE: ${buildLifestylePrompt(options)}`);
+  } else {
+    sections.push(`\nSHOT TYPE: ${SHOT_TYPE_TEMPLATES[options.shotType]}`);
+  }
 
   // Background
   sections.push(`\nBACKGROUND: ${buildBackgroundDescription(options)}`);

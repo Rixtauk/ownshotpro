@@ -33,6 +33,18 @@ export type ReflectionType = "none" | "subtle" | "strong";
 
 export type ProductPresetType = "amazon" | "brand_hero" | "social" | "catalog" | "custom";
 
+// Lifestyle scene variations for variety on regeneration
+export type LifestyleScene =
+  | "random"
+  | "kitchen_counter"
+  | "office_desk"
+  | "outdoor_cafe"
+  | "cozy_home"
+  | "bathroom_shelf"
+  | "bedside_table"
+  | "garden_patio"
+  | "living_room";
+
 export interface ProductOptions {
   // Quick preset (sets all other values)
   quickPreset: ProductPresetType;
@@ -92,6 +104,9 @@ export interface ProductOptions {
   // Props (only for lifestyle/flatlay)
   allowProps: boolean;
   propSuggestions?: string;
+
+  // Lifestyle scene (only for lifestyle shot type)
+  lifestyleScene?: LifestyleScene;
 }
 
 // Default product options
@@ -131,6 +146,7 @@ export const DEFAULT_PRODUCT_OPTIONS: ProductOptions = {
     colorAccuracy: true,
   },
   allowProps: false,
+  lifestyleScene: "random",
 };
 
 // Labels for UI display
@@ -205,4 +221,16 @@ export const QUICK_PRESET_LABELS: Record<ProductPresetType, string> = {
   social: "Social Post",
   catalog: "Catalog",
   custom: "Custom",
+};
+
+export const LIFESTYLE_SCENE_LABELS: Record<LifestyleScene, string> = {
+  random: "Random (varies each time)",
+  kitchen_counter: "Kitchen Counter",
+  office_desk: "Office Desk",
+  outdoor_cafe: "Outdoor Cafe",
+  cozy_home: "Cozy Home",
+  bathroom_shelf: "Bathroom Shelf",
+  bedside_table: "Bedside Table",
+  garden_patio: "Garden Patio",
+  living_room: "Living Room",
 };

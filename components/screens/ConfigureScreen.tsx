@@ -67,6 +67,7 @@ import {
   SurfaceType,
   ClothType,
   ReflectionType,
+  LifestyleScene,
   QUICK_PRESET_LABELS,
   SHOT_TYPE_LABELS,
   BACKGROUND_STYLE_LABELS,
@@ -77,6 +78,7 @@ import {
   SURFACE_TYPE_LABELS,
   CLOTH_TYPE_LABELS,
   REFLECTION_TYPE_LABELS,
+  LIFESTYLE_SCENE_LABELS,
 } from "@/types/product";
 import { cn } from "@/lib/utils";
 
@@ -780,6 +782,36 @@ export function ConfigureScreen({
                         )}
                       </div>
                     </div>
+
+                    {/* Scene selector for lifestyle shots */}
+                    {productOptions.shotType === "lifestyle" && (
+                      <div className="space-y-2">
+                        <Label className="text-foreground text-sm">Scene</Label>
+                        <Select
+                          value={productOptions.lifestyleScene || "random"}
+                          onValueChange={(value: LifestyleScene) =>
+                            onProductOptionsChange({ ...productOptions, lifestyleScene: value })
+                          }
+                          disabled={isLoading}
+                        >
+                          <SelectTrigger className="rounded-lg bg-muted/50">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {(Object.entries(LIFESTYLE_SCENE_LABELS) as [LifestyleScene, string][]).map(
+                              ([scene, label]) => (
+                                <SelectItem key={scene} value={scene}>
+                                  {label}
+                                </SelectItem>
+                              )
+                            )}
+                          </SelectContent>
+                        </Select>
+                        <p className="text-xs text-muted-foreground">
+                          Random generates a different scene each time
+                        </p>
+                      </div>
+                    )}
                   </div>
                 </ConfigCard>
 
