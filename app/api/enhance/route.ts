@@ -3,8 +3,9 @@ import { generateEnhancedImage } from "@/lib/gemini";
 import { buildEnhancementPrompt, buildInteriorPrompt } from "@/lib/promptBuilder";
 import { buildProductPrompt } from "@/lib/productPromptBuilder";
 import { buildFoodPromptFromOptions } from "@/lib/foodPromptBuilder";
+import { buildAutoPrompt } from "@/lib/autoPromptBuilder";
 import { validateImageFile } from "@/lib/validators";
-import { Preset, AspectRatio, ImageSize, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS, TransformMode } from "@/types";
+import { Preset, AspectRatio, ImageSize, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS, AutoOptions, DEFAULT_AUTO_OPTIONS, TransformMode } from "@/types";
 
 // Force Node.js runtime (not Edge)
 export const runtime = "nodejs";
@@ -66,6 +67,17 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Automotive-specific options
+    const autoOptionsStr = formData.get("autoOptions") as string | null;
+    let autoOptions: AutoOptions = DEFAULT_AUTO_OPTIONS;
+    if (autoOptionsStr) {
+      try {
+        autoOptions = JSON.parse(autoOptionsStr);
+      } catch (e) {
+        console.error("Failed to parse automotive options:", e);
+      }
+    }
+
     // Derive transform mode for interior from legacy flags
     let transformMode: TransformMode = "retouch";
     if (magazineReshoot) {
@@ -87,12 +99,17 @@ export async function POST(request: NextRequest) {
       // Product mode with studio-quality controls
       console.log(`Processing Product (shot: ${productOptions.shotType}, preset: ${productOptions.quickPreset}, labelProtection: ${productOptions.labelProtection.enabled})...`);
       prompt = buildProductPrompt(productOptions);
+    } else if (preset === "automotive") {
+      // Automotive mode with vehicle photography controls
+      console.log(`Processing Automotive (shot: ${autoOptions.shotType}, angle: ${autoOptions.angle}, environment: ${autoOptions.environment})...`);
+      prompt = buildAutoPrompt(autoOptions);
+      console.log("Automotive prompt:\n", prompt);
     } else if (preset === "interior") {
       // Single-pass Interior processing with geometry-first prompt
-      console.log(`Processing Interior (mode: ${transformMode}, creativeCrop: ${creativeCrop})...`);
+      console.log(`Processing Interior (mode: ${transformMode}, strength: ${strength})...`);
       prompt = buildInteriorPrompt({
         transformMode,
-        creativeCrop,
+        strength,
         propSuggestions: propSuggestions || undefined,
       });
     } else {

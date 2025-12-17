@@ -42,7 +42,7 @@ export interface FoodOptions {
   dishHint?: string; // Optional hint about the dish
 }
 
-// UI Labels for transform modes
+// UI Labels for transform modes (Food)
 export const TRANSFORM_MODE_LABELS: Record<TransformMode, { title: string; description: string }> = {
   retouch: {
     title: "Retouch Only",
@@ -55,6 +55,22 @@ export const TRANSFORM_MODE_LABELS: Record<TransformMode, { title: string; descr
   reshoot_styled: {
     title: "Reshoot + Styling",
     description: "Full magazine-style shot with props and styling"
+  }
+};
+
+// UI Labels for transform modes (Interior) - different descriptions
+export const INTERIOR_MODE_LABELS: Record<TransformMode, { title: string; description: string }> = {
+  retouch: {
+    title: "Polish",
+    description: "Fix geometry, enhance lighting. Keeps your exact composition."
+  },
+  reshoot: {
+    title: "Recompose",
+    description: "New straight-on camera angle. Extends frame to show more room."
+  },
+  reshoot_styled: {
+    title: "Restyle",
+    description: "Recompose + add décor (plants, books, artwork, rugs)."
   }
 };
 

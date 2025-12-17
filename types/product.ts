@@ -33,6 +33,13 @@ export type ReflectionType = "none" | "subtle" | "strong";
 
 export type ProductPresetType = "amazon" | "brand_hero" | "social" | "catalog" | "custom";
 
+// Product scale for size-appropriate staging
+export type ProductScale = "small" | "medium" | "large" | "extra_large";
+// small = jewelry, cosmetics, small electronics (fits in palm)
+// medium = bottles, boxes, small appliances (fits on desk)
+// large = furniture, large appliances, fitness equipment (floor-standing)
+// extra_large = vehicles → should redirect to automotive preset
+
 // Lifestyle scene variations for variety on regeneration
 export type LifestyleScene =
   | "random"
@@ -48,6 +55,9 @@ export type LifestyleScene =
 export interface ProductOptions {
   // Quick preset (sets all other values)
   quickPreset: ProductPresetType;
+
+  // Product scale (affects staging and camera setup)
+  scale: ProductScale;
 
   // Shot type
   shotType: ProductShotType;
@@ -112,6 +122,7 @@ export interface ProductOptions {
 // Default product options
 export const DEFAULT_PRODUCT_OPTIONS: ProductOptions = {
   quickPreset: "custom",
+  scale: "medium",
   shotType: "packshot",
   background: {
     style: "white",
@@ -233,4 +244,18 @@ export const LIFESTYLE_SCENE_LABELS: Record<LifestyleScene, string> = {
   bedside_table: "Bedside Table",
   garden_patio: "Garden Patio",
   living_room: "Living Room",
+};
+
+export const PRODUCT_SCALE_LABELS: Record<ProductScale, string> = {
+  small: "Small",
+  medium: "Medium",
+  large: "Large",
+  extra_large: "Extra Large",
+};
+
+export const PRODUCT_SCALE_DESCRIPTIONS: Record<ProductScale, string> = {
+  small: "Jewelry, cosmetics, small electronics",
+  medium: "Bottles, boxes, small appliances",
+  large: "Furniture, large appliances, equipment",
+  extra_large: "Vehicles (use Automotive preset)",
 };

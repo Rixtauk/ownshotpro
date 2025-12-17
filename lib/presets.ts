@@ -81,6 +81,22 @@ export const PRESETS: Record<Preset, PresetDefinition> = {
       "preserve original composition",
     ],
   },
+  automotive: {
+    id: "automotive",
+    label: "Automotive",
+    description: "Professional vehicle photography for dealerships and showcases",
+    focusAreas: [
+      "paint reflections",
+      "chrome details",
+      "glass clarity",
+      "wheel definition",
+    ],
+    styleHints: [
+      "dramatic lighting",
+      "enhance metallic finish",
+      "clean reflections",
+    ],
+  },
 };
 
 export const ASPECT_RATIOS = [

@@ -7,10 +7,42 @@ import { WIZARD_STEPS, type WizardStep } from "@/types/wizard";
 
 interface WizardStepIndicatorProps {
   currentStep: WizardStep;
+  compact?: boolean;
 }
 
-export function WizardStepIndicator({ currentStep }: WizardStepIndicatorProps) {
+export function WizardStepIndicator({ currentStep, compact = false }: WizardStepIndicatorProps) {
   const currentStepNumber = WIZARD_STEPS.find((s) => s.id === currentStep)?.number ?? 1;
+
+  // Compact mode for results page - just show dots
+  if (compact) {
+    return (
+      <div className="flex items-center justify-center gap-2 py-2">
+        {WIZARD_STEPS.map((step, index) => {
+          const isCompleted = step.number < currentStepNumber;
+          const isCurrent = step.number === currentStepNumber;
+          return (
+            <React.Fragment key={step.id}>
+              <div
+                className={cn(
+                  "h-2 w-2 rounded-full transition-all",
+                  (isCompleted || isCurrent) && "bg-primary",
+                  !isCompleted && !isCurrent && "bg-muted"
+                )}
+              />
+              {index < WIZARD_STEPS.length - 1 && (
+                <div
+                  className={cn(
+                    "h-0.5 w-6 transition-colors",
+                    step.number < currentStepNumber ? "bg-primary" : "bg-muted"
+                  )}
+                />
+              )}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  }
 
   return (
     <div className="flex items-center justify-center gap-2 md:gap-4 py-4">

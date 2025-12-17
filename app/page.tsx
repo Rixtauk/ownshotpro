@@ -4,12 +4,12 @@ import { useState, useCallback } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { WizardStepIndicator } from "@/components/wizard/WizardStepIndicator";
 import { UploadScreen } from "@/components/screens/UploadScreen";
-import { ConfigureScreen } from "@/components/screens/ConfigureScreen";
+import { ConfigureScreenV2 } from "@/components/screens/ConfigureScreenV2";
 import { ResultsScreen } from "@/components/screens/ResultsScreen";
 import { MotionLayout } from "@/components/motion-layout";
 import { EnhanceProgressDialog } from "@/components/enhance-progress-dialog";
 import { HistoryItem } from "@/components/history-filmstrip";
-import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS } from "@/types";
+import { EnhanceOptions, ProductOptions, DEFAULT_PRODUCT_OPTIONS, FoodOptions, DEFAULT_FOOD_OPTIONS, AutoOptions, DEFAULT_AUTO_OPTIONS } from "@/types";
 import { WizardStep } from "@/types/wizard";
 import { validateImageFile } from "@/lib/validators";
 import { applyProductPreset } from "@/lib/productPresets";
@@ -38,6 +38,7 @@ export default function Home() {
   const [options, setOptions] = useState<EnhanceOptions>(DEFAULT_OPTIONS);
   const [productOptions, setProductOptions] = useState<ProductOptions>(DEFAULT_PRODUCT_OPTIONS);
   const [foodOptions, setFoodOptions] = useState<FoodOptions>(DEFAULT_FOOD_OPTIONS);
+  const [autoOptions, setAutoOptions] = useState<AutoOptions>(DEFAULT_AUTO_OPTIONS);
   const [showProgressDialog, setShowProgressDialog] = useState(false);
 
   // History state for iterations
@@ -125,6 +126,11 @@ export default function Home() {
         formData.append("foodOptions", JSON.stringify(foodOptions));
       }
 
+      // Add automotive options when in automotive mode
+      if (options.preset === "automotive") {
+        formData.append("autoOptions", JSON.stringify(autoOptions));
+      }
+
       // Add transform mode for interior
       formData.append("transformMode", options.transformMode ?? "reshoot");
 
@@ -200,6 +206,14 @@ export default function Home() {
         foodOptions.styling.addSteam && "Steam",
         foodOptions.styling.addCondensation && "Condensation",
       ].filter(Boolean).join(" · ")
+    : options.preset === "automotive"
+    ? [
+        "Automotive",
+        autoOptions.shotType.replace("_", " ").replace(/\b\w/g, c => c.toUpperCase()),
+        autoOptions.angle.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        autoOptions.environment.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase()),
+        autoOptions.showMovement && "Motion",
+      ].filter(Boolean).join(" · ")
     : [
         options.preset.charAt(0).toUpperCase() + options.preset.slice(1),
         options.imageSize,
@@ -227,8 +241,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Wizard Step Indicator */}
-      <WizardStepIndicator currentStep={wizardStep} />
+      {/* Wizard Step Indicator - compact on results page */}
+      <WizardStepIndicator currentStep={wizardStep} compact={wizardStep === 'results'} />
 
       {/* Wizard Content with Motion */}
       <main className="mx-auto max-w-screen-2xl">
@@ -244,7 +258,7 @@ export default function Home() {
           )}
 
           {wizardStep === 'configure' && (
-            <ConfigureScreen
+            <ConfigureScreenV2
               file={file}
               originalPreview={originalPreview}
               options={options}
@@ -253,6 +267,8 @@ export default function Home() {
               onProductOptionsChange={handleProductOptionsChange}
               foodOptions={foodOptions}
               onFoodOptionsChange={setFoodOptions}
+              autoOptions={autoOptions}
+              onAutoOptionsChange={setAutoOptions}
               onChangeImage={goToUpload}
               onGenerate={handleGenerate}
               isLoading={isLoading}

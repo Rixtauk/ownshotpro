@@ -10,6 +10,7 @@ import type {
   ReflectionType,
   ClothType,
   LifestyleScene,
+  ProductScale,
 } from "@/types/product";
 
 /**
@@ -174,6 +175,48 @@ const LIFESTYLE_SCENES: Record<LifestyleSceneKey, LifestyleSceneData> = {
 };
 
 /**
+ * Helper to get appropriate surfaces based on product scale
+ * Large products can't be placed on tabletop surfaces
+ */
+export function getAvailableSurfaces(scale: ProductScale): SurfaceType[] {
+  if (scale === "large" || scale === "extra_large") {
+    // Large products: only floor-based or none
+    return ["none"];
+  }
+
+  // Small and medium products can use all surfaces
+  return [
+    "none",
+    "acrylic",
+    "paper",
+    "concrete",
+    "marble",
+    "wood_light",
+    "wood_dark",
+    "cloth",
+  ];
+}
+
+/**
+ * Get scale-specific camera and staging adjustments
+ */
+function getScaleAdjustments(scale: ProductScale): string {
+  switch (scale) {
+    case "small":
+      return "Macro product photography optimized for small objects. Close-up perspective emphasizing fine details, textures, and craftsmanship. Controlled studio environment with precise lighting for maximum detail capture.";
+
+    case "medium":
+      return "Standard product photography with balanced perspective. Product comfortably fits in frame with appropriate environmental context.";
+
+    case "large":
+      return "Large-scale product photography with increased camera distance and environmental context. Product positioned on floor or in room setting with appropriate sense of scale. Professional lighting setup using larger softboxes and room illumination. Wide perspective showing product in realistic spatial context.";
+
+    case "extra_large":
+      return "⚠️ EXTRA LARGE SCALE DETECTED - Consider using Automotive preset for vehicles. If proceeding: Expansive environmental photography with significant camera distance. Product requires large space context. Professional studio or outdoor environment with appropriate scale reference.";
+  }
+}
+
+/**
  * Get randomized lifestyle setup for variety on regeneration
  */
 function getRandomLifestyleSetup(scene?: LifestyleScene): {
@@ -221,10 +264,15 @@ Natural, editorial quality that feels authentic and aspirational.`;
 }
 
 /**
- * Build surface description including cloth specifics
+ * Build surface description including cloth specifics and scale validation
  */
 function buildSurfaceDescription(options: ProductOptions): string {
-  const { surface } = options;
+  const { surface, scale } = options;
+
+  // For large products, override surface selection if needed
+  if ((scale === "large" || scale === "extra_large") && surface.type !== "none") {
+    return "product positioned on floor or in appropriate large-scale room environment";
+  }
 
   if (surface.type === "none") {
     return SURFACE_DESCRIPTIONS.none;
@@ -418,6 +466,10 @@ export function buildProductPrompt(options: ProductOptions): string {
 
   // Always start with base rules
   sections.push(BASE_RULES);
+
+  // Product scale adjustments
+  const scaleAdjustments = getScaleAdjustments(options.scale);
+  sections.push(`\nSCALE: ${scaleAdjustments}`);
 
   // Shot type template - use dynamic lifestyle prompt for lifestyle shots
   if (options.shotType === "lifestyle") {

@@ -1,5 +1,5 @@
 // Preset types
-export type Preset = "interior" | "product" | "people" | "general" | "food";
+export type Preset = "interior" | "product" | "people" | "general" | "food" | "automotive";
 
 // Re-export product types
 export * from "./product";
@@ -8,6 +8,9 @@ export * from "./product";
 import type { TransformMode as TM } from "./food";
 export type TransformMode = TM;
 export * from "./food";
+
+// Re-export automotive types
+export * from "./automotive";
 
 // Aspect ratio options
 export type AspectRatio = "match" | "1:1" | "4:5" | "16:9" | "3:2" | "9:16";

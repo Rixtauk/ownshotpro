@@ -94,7 +94,7 @@ export function ResultsScreen({
   };
 
   return (
-    <AppContainer className="max-w-5xl py-8">
+    <AppContainer className="max-w-4xl py-4">
       <Card className="overflow-hidden">
         {/* Header with view mode toggle */}
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border p-4">
@@ -150,16 +150,16 @@ export function ResultsScreen({
         </div>
 
         {/* Image preview area */}
-        <div className="relative p-4">
+        <div className="relative p-3">
           {/* Error display */}
           {error && (
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/30 px-4 py-2 shadow-lg">
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2 rounded-lg bg-destructive/10 border border-destructive/30 px-4 py-2 shadow-lg">
               <AlertCircle className="h-4 w-4 text-destructive" />
               <span className="text-sm text-destructive">{error}</span>
             </div>
           )}
 
-          <div className="relative w-full aspect-[4/3] overflow-hidden rounded-xl bg-muted">
+          <div className="relative w-full aspect-[4/3] lg:aspect-[16/10] max-h-[60vh] overflow-hidden rounded-xl bg-muted">
             {viewMode === "compare" && enhancedUrl ? (
               // Compare mode with react-compare-slider
               <BeforeAfter
@@ -206,7 +206,7 @@ export function ResultsScreen({
 
         {/* History filmstrip */}
         {history.length > 0 && onHistorySelect && (
-          <div className="px-4 pb-4">
+          <div className="px-3 pb-3">
             <HistoryFilmstrip
               items={history}
               activeId={activeHistoryId}
@@ -215,31 +215,29 @@ export function ResultsScreen({
           </div>
         )}
 
-        {/* Settings summary */}
-        <div className="border-t border-border px-4 py-3 bg-muted/30">
-          <p className="text-xs text-muted-foreground text-center truncate">
+        {/* Settings summary + Action buttons combined */}
+        <div className="border-t border-border p-3 bg-muted/30">
+          <p className="text-xs text-muted-foreground text-center truncate mb-3">
             {settingsSummary}
           </p>
-        </div>
-
-        {/* Action buttons */}
-        <div className="border-t border-border p-4">
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
             <Button
               variant="ghost"
+              size="sm"
               onClick={onStartOver}
-              className="flex-1 h-11 rounded-xl"
+              className="flex-1 h-9 rounded-lg"
             >
-              <RotateCcw className="w-4 h-4 mr-2" />
+              <RotateCcw className="w-4 h-4 mr-1.5" />
               Start Over
             </Button>
             <Button
               variant="secondary"
+              size="sm"
               onClick={onAdjustSettings}
-              className="flex-1 h-11 rounded-xl"
+              className="flex-1 h-9 rounded-lg"
             >
-              <Settings className="w-4 h-4 mr-2" />
-              Adjust Settings
+              <Settings className="w-4 h-4 mr-1.5" />
+              Adjust
             </Button>
 
             {/* Download with format dropdown */}
@@ -247,11 +245,12 @@ export function ResultsScreen({
               <DropdownMenuTrigger asChild>
                 <MotionButton
                   disabled={!enhancedUrl || isLoading}
-                  className="flex-1"
+                  size="sm"
+                  className="flex-1 h-9"
                 >
-                  <Download className="w-4 h-4 mr-2" />
+                  <Download className="w-4 h-4 mr-1.5" />
                   Download
-                  <ChevronDown className="w-4 h-4 ml-1" />
+                  <ChevronDown className="w-3.5 h-3.5 ml-1" />
                 </MotionButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">

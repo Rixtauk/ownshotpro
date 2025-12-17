@@ -14,6 +14,7 @@ import {
   SurfaceType,
   ClothType,
   ReflectionType,
+  ProductScale,
   QUICK_PRESET_LABELS,
   SHOT_TYPE_LABELS,
   BACKGROUND_STYLE_LABELS,
@@ -24,7 +25,10 @@ import {
   SURFACE_TYPE_LABELS,
   CLOTH_TYPE_LABELS,
   REFLECTION_TYPE_LABELS,
+  PRODUCT_SCALE_LABELS,
+  PRODUCT_SCALE_DESCRIPTIONS,
 } from "@/types/product";
+import { getAvailableSurfaces } from "@/lib/productPromptBuilder";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -76,6 +80,10 @@ export function ProductOptionsForm({
     } as ProductOptions);
   };
 
+  // Get available surfaces based on scale
+  const availableSurfaces = getAvailableSurfaces(options.scale);
+  const isSurfaceDisabled = (scale: ProductScale) => scale === "large" || scale === "extra_large";
+
   return (
     <Card className="glass-card">
       <CardContent className="p-6 space-y-6">
@@ -101,6 +109,40 @@ export function ProductOptionsForm({
               </Button>
             ))}
           </div>
+        </div>
+
+        {/* Product Scale */}
+        <div className="space-y-3">
+          <Label className="text-foreground">Product Scale</Label>
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              Object.entries(PRODUCT_SCALE_LABELS) as [ProductScale, string][]
+            ).map(([scale, label]) => (
+              <div key={scale} className="relative">
+                <Button
+                  variant={options.scale === scale ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => updateOptions({ scale, surface: { type: "none" } })}
+                  disabled={disabled}
+                  className="w-full"
+                >
+                  <div className="flex flex-col items-center">
+                    <span className="text-xs font-semibold">{label}</span>
+                    <span className="text-[10px] opacity-70 mt-0.5">
+                      {PRODUCT_SCALE_DESCRIPTIONS[scale]}
+                    </span>
+                  </div>
+                </Button>
+              </div>
+            ))}
+          </div>
+          {options.scale === "extra_large" && (
+            <div className="p-3 bg-yellow-500/10 border border-yellow-500/20 rounded-md">
+              <p className="text-xs text-yellow-600 dark:text-yellow-500">
+                For vehicles and extra-large products, consider using the Automotive preset for better results.
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Shot Type */}
@@ -377,13 +419,20 @@ export function ProductOptionsForm({
           <CollapsibleContent className="space-y-4 pt-2">
             {/* Surface */}
             <div className="space-y-2 pl-2">
-              <Label className="text-sm">Surface</Label>
+              <div className="flex justify-between items-center">
+                <Label className="text-sm">Surface</Label>
+                {isSurfaceDisabled(options.scale) && (
+                  <span className="text-xs text-muted-foreground italic">
+                    Disabled for large products
+                  </span>
+                )}
+              </div>
               <Select
                 value={options.surface.type}
                 onValueChange={(value: SurfaceType) =>
                   updateNested("surface", { type: value })
                 }
-                disabled={disabled}
+                disabled={disabled || isSurfaceDisabled(options.scale)}
               >
                 <SelectTrigger>
                   <SelectValue />
@@ -394,11 +443,13 @@ export function ProductOptionsForm({
                       SurfaceType,
                       string
                     ][]
-                  ).map(([surface, label]) => (
-                    <SelectItem key={surface} value={surface}>
-                      {label}
-                    </SelectItem>
-                  ))}
+                  )
+                    .filter(([surface]) => availableSurfaces.includes(surface))
+                    .map(([surface, label]) => (
+                      <SelectItem key={surface} value={surface}>
+                        {label}
+                      </SelectItem>
+                    ))}
                 </SelectContent>
               </Select>
 
